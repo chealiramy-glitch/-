@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق المصحف المعلم - رواية قالون عن نافع</title>
+    <!-- استيراد خط عثماني جميل للقرآن -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            direction: rtl;
+        }
+        header {
+            background: linear-gradient(135deg, #065f46, #047857);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        header p {
+            font-size: 0.95rem;
+            color: #a7f3d0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        select, button {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+        select {
+            flex: 1;
+            background: white;
+            cursor: pointer;
+        }
+        button {
+            background-color: #059669;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #047857;
+        }
+        .ayah-box {
+            font-family: 'Amiri Quran', serif;
+            font-size: 2rem;
+            line-height: 2.5;
+            text-align: center;
+            padding: 2rem;
+            background: #f0fdf4;
+            border: 2px dashed #bbf7d0;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            color: #064e3b;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .btn-audio {
+            background-color: #2563eb;
+        }
+        .btn-audio:hover {
+            background-color: #1d4ed8;
+        }
+        .info-text {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>المصحف المعلم (رواية قالون عن نافع)</h1>
+        <p>تطبيق تفاعلي لقراءة وسماع آيات الذكر الحكيم</p>
+    </header>
+
+    <div class="container">
+        <!-- لوحة التحكم لاختيار السورة والآية -->
+        <div class="card">
+            <div class="controls">
+                <select id="surahSelect" onchange="loadAyahs()">
+                    <option value="">اختر السورة...</option>
+                    <option value="1">سورة الفاتحة</option>
+                    <option value="112">سورة الإخلاص</option>
+                    <option value="113">سورة الفلق</option>
+                    <option value="114">سورة الناس</option>
+                </select>
+                
+                <select id="ayahSelect" onchange="displayAyah()">
+                    <option value="">اختر الآية...</option>
+                </select>
+            </div>
+
+            <!-- عرض نص الآية -->
+            <div id="ayahText" class="ayah-box">
+                أهلاً بك! اختر السورة والآية للبدء بالقراءة والتلاوة.
+            </div>
+
+            <!-- أزرار التفاعل والسماع -->
+            <div class="actions">
+                <button id="playBtn" class="btn-audio" onclick="playAudio()" disabled>🔊 استمع للآية (المعلم)</button>
+            </div>
+        </div>
+
+        <div class="info-text">
+            <p>يتم جلب الآيات والصوتيات مباشرة عبر واجهات برمجة التطبيقات (API) المعتمدة.</p>
+        </div>
+    </div>
+
+    <!-- مشغل الصوت المخفي -->
+    <audio id="audioPlayer" onended="onAudioEnded()"></audio>
+
+    <script>
+        let currentAyahsData = [];
+
+        // جلب الآيات عند تغيير السورة باستخدام Quran API
+        async function loadAyahs() {
+            const surahId = document.getElementById('surahSelect').value;
+            const ayahSelect = document.getElementById('ayahSelect');
+            ayahSelect.innerHTML = '<option value="">جاري التحميل...</option>';
+            
+            if (!surahId) {
+                ayahSelect.innerHTML = '<option value="">اختر الآية...</option>';
+                return;
+            }
+
+            try {
+                // استخدام API عام لجلب السورة والآيات
+                const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}`);
+                const data = await response.json();
+                
+                if(data.code === 200) {
+                    currentAyahsData = data.data.ayahs;
+                    ayahSelect.innerHTML = '<option value="">اختر الآية...</option>';
+                    
+                    currentAyahsData.forEach((ayah, index) => {
+                        let option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = `الآية رقم ${ayah.numberInSurah}`;
+                        ayahSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                ayahSelect.innerHTML = '<option value="">فشل التحميل، حاول مجدداً</option>';
+            }
+        }
+
+        // عرض الآية المختارة
+        function displayAyah() {
+            const index = document.getElementById('ayahSelect').value;
+            const ayahTextDiv = document.getElementById('ayahText');
+            const playBtn = document.getElementById('playBtn');
+
+            if (index === "") {
+                ayahTextDiv.textContent = "الرجاء اختيار الآية لعرضها.";
+                playBtn.disabled = true;
+                return;
+            }
+
+            const selectedAyah = currentAyahsData[index];
+            ayahTextDiv.textContent = `${selectedAyah.text} ﴿${selectedAyah.numberInSurah}﴾`;
+            playBtn.disabled = false;
+        }
+
+        // تشغيل صوت الآية (تلاوة الشيخ الحصري / المصحف المعلم كمثال)
+        function playAudio() {
+            const index = document.getElementById('ayahSelect').value;
+            if (index === "") return;
+
+            const selectedAyah = currentAyahsData[index];
+            const audioPlayer = document.getElementById('audioPlayer');
+            const playBtn = document.getElementById('playBtn');
+
+            // رابط الصوت الخاص بالآية (رابط صوتي مباشر لكل آية من المصحف المترتل)
+            // استخدام تلاوة محمود خليل الحصري (المصحف المعلم متوفر في شبكة القرآن)
+            const audioUrl = `https://everyayah.com/data/Husary_128kbps/${padZero(selectedAyah.surah?.number || document.getElementById('surahSelect').value)}${padZero(selectedAyah.numberInSurah)}.mp3`;
+
+            audioPlayer.src = audioUrl;
+            audioPlayer.play();
+            playBtn.textContent = "⏳ جاري التلاوة...";
+            playBtn.disabled = true;
+        }
+
+        // إعادة الزر لحالته الطبيعية عند انتهاء الصوت
+        function onAudioEnded() {
+            const playBtn = document.getElementById('playBtn');
+            playBtn.textContent = "🔊 استمع للآية (المعلم)";
+            playBtn.disabled = false;
+        }
+
+        // دالة مساعدة لتنسيق أرقام الملفات الصوتية (مثلاً 001001.mp3)
+        function padZero(num) {
+            let s = num + "";
+            while (s.length < 3) s = "0" + s;
+            return s;
+        }
+    </script>
+</body>
+</html>
