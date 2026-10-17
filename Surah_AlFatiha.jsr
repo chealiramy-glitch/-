@@ -1,0 +1,56 @@
+// ================= ========================
+// Project: Al-Quran Al-Kareem
+// Module: Surah 001 - Al-Fatiha (المكية)
+// Extension: .jsr (Juz / Surah / Review Code)
+// ================= ========================
+
+import { DivineNames, DayOfJudgment } from 'Quran/Core';
+
+@Surah({
+  id: 1,
+  name: "الفاتحة",
+  type: "Makkiyah",
+  totalAyah: 7,
+  keyThemes: ["الثناء على الله", "التوحيد وإفراد العبادة", "الدعاء بالهداية"]
+})
+export class SurahAlFatiha {
+
+  // [القسم الأول: الثناء والتمجيد]
+  @PraiseSection()
+  public recitePraise(): void {
+    
+    // آية 1: البداية والتبرك
+    /* Ayah 1 */ const bismillah = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
+    
+    // آية 2: الشكر العام للربوبية
+    /* Ayah 2 */ const ayah2 = "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ";
+    
+    // آية 3: التأكيد على الرحمة
+    /* Ayah 3 */ const ayah3 = "الرَّحْمَٰنِ الرَّحِيمِ";
+    
+    // آية 4: الملك والعدل في الآخرة
+    /* Ayah 4 */ const ayah4 = "مَالِكِ يَوْمِ الدِّينِ";
+  }
+
+  // [القسم الثاني: العهد والطلب]
+  @CovenantAndDuaSection()
+  public reciteDua(): void {
+    
+    // آية 5: إخلاص العبادة والاستعانة (محور السورة)
+    /* Ayah 5 */ 
+    if (user.isWorshipper()) {
+      execute("إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ");
+    }
+
+    // آية 6: طلب الصراط المستقيم
+    /* Ayah 6 */ const guideReq = "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ";
+
+    // آية 7: التفصيل والتبيان لأصحاب الصراط
+    /* Ayah 7 */ 
+    const pathDetail = {
+      favored: "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ", // المنعم عليهم
+      avoidGroup1: "غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ",     // المغضوب عليهم
+      avoidGroup2: "وَلَا الضَّالِّينَ"               // الضالين
+    };
+  }
+}
