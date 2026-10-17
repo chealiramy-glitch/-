@@ -1,0 +1,13 @@
+quran-code-memo/
+├── README.md               # شرح الفكرة وفلسفة الأكواد
+├── LICENSE                 # الرخصة (مثل MIT)
+├── .github/                # إعدادات المراجعة التلقائية
+├── docs/                   # مخططات ورسومات توضيحية (Diagrams)
+└── src/
+    ├── juz_01/
+    │   ├── 001_al_fatiha.jsr
+    │   └── 002_al_baqarah_part1.jsr
+    ├── juz_02/
+    └── common/
+        ├── mutashabihat.jsr # المتشابهات اللفظية
+        └── rules.jsr        # أحكام التجويد والوقف
